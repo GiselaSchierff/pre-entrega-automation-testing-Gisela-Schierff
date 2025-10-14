@@ -1,6 +1,10 @@
-# tomar textos de selectores para usar en el login 
+# NO ES FACIL tomar textos de selectores para usar en el login, eliminar los archivos (MEJOR) O COPYPASTEAR DE CHATGPT
+
 #REVISAR COMENTARIOS 
 import pytest
+
+
+import utils.helpers
 
 @pytest.fixture
 def driver():
