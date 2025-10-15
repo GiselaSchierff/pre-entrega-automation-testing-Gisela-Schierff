@@ -1,4 +1,4 @@
-# xrear sistema de login con selenium
+# crear sistema de login con selenium
 
 
 # IMPROTACIONES
@@ -9,9 +9,27 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 import time
 
+# importar json según Brayann 
+
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(''),'..')))
+
+#IMPORTAR JSON SEGÚN CHATGPT 
+
+import json
+import os
+
+# Ruta al archivo actual
+current_dir = os.path.dirname(__file__)
+
+# Cargar datos.json
+with open(os.path.join(current_dir, 'datos.json'), 'r', encoding='utf-8') as f:
+    datos = json.load(f)
+
+# Cargar selectores.json
+with open(os.path.join(current_dir, 'selectores.json'), 'r', encoding='utf-8') as f:
+    selectores = json.load(f)
 
 
 URL = "https://www.saucedemo.com/"
