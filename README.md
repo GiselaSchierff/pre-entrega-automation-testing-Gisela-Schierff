@@ -33,7 +33,7 @@ COMANDOS DE INSTALACION DE PYTHON Y SELENIUM, PIP (VER SI HAY MAS EN APUNTES IMP
 # Comando para ejecutar las pruebas (por ejemplo: pytest -v --html=reporte.html)
 
 
-para generar un reporte HTML autosuficiente en la consola, se debe escribir pytest --html=report.html --self-contained-html 
+para generar un reporte HTML autosuficiente en la consola, se debe escribir pytest --html=reports/report.html --self-contained-html 
 
 
 para hacer correr los tests, ejecutar el siguiente comando en la consola python3 (nombre del arhivo).py

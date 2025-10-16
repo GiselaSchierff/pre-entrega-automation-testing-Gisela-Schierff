@@ -55,4 +55,18 @@ def get_driver(): # se divide responsabilidad
 
     return driver # devuelve sesión de selenium
 
-def login_saucedemo(driver): # recibe el driver  
+def login_saucedemo(driver): # recibe el driver 
+    # abre link
+    driver.get(URL)
+    # verifica que esté en la página esperada (saucedemo.com) 
+    assert URL == driver.current_url
+    time.sleep(5)
+    # ingresa credenciales
+    driver.find_element(By.ID, "user-name").send_keys(USERNAME)
+    driver.find_element(By.ID, "password").send_keys(PASSWORD)
+    
+    # sacar captura
+    driver.save_screenshot("reports/escribir_credenciales.png")
+
+    # hacer click al boton para logearse
+    driver.find_element(By.ID, "login-button").click()
