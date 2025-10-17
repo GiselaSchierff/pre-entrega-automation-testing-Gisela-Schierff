@@ -2,6 +2,7 @@
 
 #REVISAR COMENTARIOS 
 import pytest
+import time
 
 import sys
 import os
@@ -38,28 +39,28 @@ def test_catalogo(driver):
     # click al boton de login -> USAR FIXTURE
     # verificar el titulo (body)
     # comprobar existencia de visibilidad de productos (leng(productos) > 0)
-    productos = driver.find_elements(By.CSS_SELECTOR, ".inventory_item")
+    time.sleep(7)
+    productos = driver.find_elements(By.CLASS_NAME, 'inventory_item')
     assert len(productos) > 0
     # verificar elementos importantes interfaz (menú, filtros, etc)
+    driver.save_screenshot("reports/ver_catalogo.png")
 
 def test_carrito(driver):
 
     # logeo de usuario con username y password 
     login_saucedemo (driver)
-    productos = driver.find_elements(By.CSS_SELECTOR, ".inventory_item")
+    time.sleep(7)
+    productos = driver.find_elements(By.CLASS_NAME, 'inventory_item')
 
-    total_productos = len(productos)
+    # total_productos = len(productos)
 
-    
-
- 
-
-    productos[0].find_elements(By.TAG_NAME, "add-to-cart-sauce-labs-backpack").click
+    productos[0].find_element(By.TAG_NAME, "button").click()
 
    
-    uno_numero_carrito = productos[0].find_elements(By.CLASS_NAME, "shopping_cart_badge").text
-    assert uno_numero_carrito == 1
+    numero_carrito = driver.find_element(By.CLASS_NAME, "shopping_cart_badge").text
+    assert int(numero_carrito) == 1
 
+    driver.save_screenshot("reports/numero_carrito.png")
 
 
     # click al boton de login -> USAR FIXTURE
