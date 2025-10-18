@@ -28,7 +28,7 @@ instalar selenium con el siguiente comando en la consola: pip install selenium
 instalar el manager del webdriven con el siguiente comando de consola: pip install webdriver-manager
 
 
-# Comando para ejecutar las pruebas (por ejemplo: pytest -v --html=reporte.html)
+# Comando para ejecutar las pruebas
 
 para generar un reporte HTML autosuficiente en la consola, corriendo los tests, se debe escribir pytest -v --html=reports/report.html --self-contained-html 
 
