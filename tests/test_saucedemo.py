@@ -1,14 +1,12 @@
-# NO ES FACIL tomar textos de selectores para usar en el login, eliminar los archivos (MEJOR) O COPYPASTEAR DE CHATGPT
 
-#REVISAR COMENTARIOS 
+#IMPORTACIONES
 import pytest
-import time
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),'..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-from utils.helpers import login_saucedemo, get_driver
+from utils.helpers import verificar_login_saucedemo, get_driver, verificar_productos_visibles_catalogo
 from selenium.webdriver.common.by import By
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,110 +16,121 @@ from selenium.webdriver.support import expected_conditions
 @pytest.fixture(scope="function") # el scope permite mantener el login abierto 
 def driver():
 
-    # configuracion para consultar a selenium webdriver 
+    # configuracion para abrir selenium webdriver 
     driver = get_driver()
     yield driver
     driver.quit()
 
 def test_login(driver):
-    # AGREGAR ESPERA EXPLICITA
-    # assert credenciales para iniciar sesión 
-    # logeo de usuario con username y password 
-    login_saucedemo(driver)
-    # click al boton de login -> USAR FIXTURE
-    # validación de redirección a pagina de inventario
-    # assert "/inventory.html" in driver.current_url
-    # verificar el titulo (PESTAÑA)
-    # verificar el titulo Products
-    # titulo = driver.find_element(By.CLASS_NAME, "title").text
-    # assert titulo == "Products"
+    # logeo de usuario con username y password, y confirmación de título de Products  
+    verificar_login_saucedemo(driver)
 
-    titulo = driver.find_element(By.CLASS_NAME, "title").text
-    assert titulo == "Products"
- 
-    # validación de redirección a pagina de inventario
-
-    assert "/inventory.html" in driver.current_url
+    # log de verificación del test
+    print("El test del login pasó correctamente")
 
 def test_catalogo(driver):
 
-    # logeo de usuario con username y password 
+    # logeo de usuario con username y password, y confirmación de título de Products  
+    verificar_login_saucedemo(driver)
 
-    login_saucedemo(driver)
+    # comprobar existencia de visibilidad de productos
+    verificar_productos_visibles_catalogo(driver)
+    
+    # verificar elementos importantes interfaz
+    # verificar hamburguesa
+    WebDriverWait(driver, 15).until(
+        expected_conditions.visibility_of_element_located((By.ID, "react-burger-menu-btn"))
+    )
 
-    titulo = WebDriverWait(driver, 15).until(
+    # verificar filtros
+    WebDriverWait(driver, 15).until(
+        expected_conditions.visibility_of_element_located((By.CLASS_NAME, "product_sort_container"))
+    )
+
+    # verificar título Products
+    titulo_products = WebDriverWait(driver, 15).until(
         expected_conditions.visibility_of_element_located((By.CLASS_NAME, "title"))
     ).text
+    assert titulo_products == "Products"
 
-    assert titulo == "Products"
-    # click al boton de login -> USAR FIXTURE
-    # verificar el titulo (body)
-    # comprobar existencia de visibilidad de productos (leng(productos) > 0)
+    # verificar texto footer
+    titulo_swag_labs = WebDriverWait(driver, 15).until(
+        expected_conditions.visibility_of_element_located((By.CLASS_NAME, "footer_copy"))
+    ).text
+    assert titulo_swag_labs == "© 2025 Sauce Labs. All Rights Reserved. Terms of Service | Privacy Policy"
 
-    WebDriverWait(driver, 15).until(
-        expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'inventory_item'))
-    )
-    productos = driver.find_elements(By.CLASS_NAME, 'inventory_item')
-    
-   # productos = driver.find_elements(By.CLASS_NAME, 'inventory_item')
-   
-    assert len(productos) > 0
-    # verificar elementos importantes interfaz (menú, filtros, etc)
+    # captura de pantalla del catálogo
     driver.save_screenshot("reports/ver_catalogo.png")
 
-
+    # log de verificación del test
+    print("El test del catálogo pasó correctamente")
 
 def test_carrito(driver):
 
-    # logeo de usuario con username y password 
-    login_saucedemo(driver)
+    # logeo de usuario con username y password, y confirmación de título de Products  
+    verificar_login_saucedemo(driver)
 
-    titulo = driver.find_element(By.CLASS_NAME, "title").text
-    assert titulo == "Products"
+    # comprobar existencia de visibilidad de productos
+    productos = verificar_productos_visibles_catalogo(driver)
+    
+    # guardar nombre del primer producto, que se va a agregar al carrito 
+    nombre_producto1_catalogo = productos[0].find_element(By.CLASS_NAME, "inventory_item_name").text
 
+    # guardar precio del primer producto, que se va a agregar al carrito 
+    precio_producto1_catalogo = productos[0].find_element(By.CLASS_NAME, "inventory_item_price").text
+
+    print(f"El producto que se quiere agregar al carrito es {nombre_producto1_catalogo} y tiene un precio de {precio_producto1_catalogo}")
+
+    # hacer click en el botón del primer prducto, para agregarlo al carrito 
+
+    # Esperar a que el primer botón tenga el texto Add to cart
     WebDriverWait(driver, 10).until(
-        expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'inventory_item'))
+        expected_conditions.text_to_be_present_in_element(
+            (By.XPATH, "//div[@class='inventory_item'][1]//button"),
+            "Add to cart"
+        )
     )
-    productos = driver.find_elements(By.CLASS_NAME, 'inventory_item')
-
-    # total_productos = len(productos)
-
-    nombreProducto1Catalogo = productos[0].find_element(By.CLASS_NAME, "inventory_item_name").text
-
-    # assert expected_conditions.invisibility_of_element(driver.find_element(By.CLASS_NAME, "cart_contents_container"))
-
     productos[0].find_element(By.TAG_NAME, "button").click()
 
-    numero_carrito = WebDriverWait(driver, 15).until(
-        expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'shopping_cart_badge'))
-    ).text
-    # numero_carrito = driver.find_element(By.CLASS_NAME, "shopping_cart_badge").text
-    assert int(numero_carrito) == 1
+    # hacer click en el carrito para ir a la página del carrito
+    carrito = WebDriverWait(driver, 10).until(
+        expected_conditions.element_to_be_clickable((By.CLASS_NAME, "shopping_cart_link"))
+    )   
+    carrito.click()
 
-    driver.save_screenshot("reports/numero_carrito.png")
-
-    driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
-
-
-    WebDriverWait(driver, 15).until(
-        expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'cart_item'))
+    # Esperar hasta que cambie la URL
+    WebDriverWait(driver, 10).until(
+        expected_conditions.url_contains("/cart.html")
     )
 
-    productosCarrito = driver.find_elements(By.CLASS_NAME, 'cart_item')
-    # productosCarrito = driver.find_elements(By.CLASS_NAME, 'cart_item')
-    assert len(productosCarrito) == 1
+    # Verificar que el título sea Your cart
+    titulo_your_cart = WebDriverWait(driver, 10).until(
+        expected_conditions.visibility_of_element_located((By.CLASS_NAME, "title"))
+    )
+    assert titulo_your_cart.text == "Your Cart"
+
+    # sacar captura del carrito con el primer producto agregado
+    driver.save_screenshot("reports/numero_carrito.png")
+
+    # verificar que haya un producto dentro del carrito 
+    WebDriverWait(driver, 15).until(
+        expected_conditions.visibility_of_element_located((By.CLASS_NAME, "cart_item"))
+    )
+    productos_carrito = driver.find_elements(By.CLASS_NAME, "cart_item")
     
+    assert len(productos_carrito) == 1
+    
+    # verificar que el nombre del producto dentro del carrito sea el mismo que el que se agregó 
+    nombre_producto1_carrito = productos_carrito[0].find_element(By.CLASS_NAME, "inventory_item_name").text
+    assert nombre_producto1_carrito == nombre_producto1_catalogo
 
-    nombreProducto1Carrito = productosCarrito[0].find_element(By.CLASS_NAME, "inventory_item_name").text
-    assert nombreProducto1Carrito == nombreProducto1Catalogo
+    # verificar que el precio del producto dentro del carrito sea el mismo que el que se agregó 
+    precioProducto1Carrito = productos_carrito[0].find_element(By.CLASS_NAME, "inventory_item_price").text
+    assert precioProducto1Carrito == precio_producto1_catalogo
 
-    assert "/cart.html" in driver.current_url
-
+    # sacar captura de la página del carrito con el primer producto agregado
     driver.save_screenshot("reports/ver_carrito.png")
 
+    # log de verificación del test
+    print("El test del carrito pasó correctamente")
 
-    # click al boton de login -> USAR FIXTURE
-    # agregar producto al carrito
-    # verificar incremento del carrito
-    # navegar pagina carrito de compras 
-    # comprobar que el producto agregado está en el carrito 
