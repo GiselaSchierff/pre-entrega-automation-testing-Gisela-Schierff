@@ -82,14 +82,14 @@ def test_carrito(driver):
     print(f"El producto que se quiere agregar al carrito es {nombre_producto1_catalogo} y tiene un precio de {precio_producto1_catalogo}")
 
 
-    # Esperar a que el primer botón tenga el texto Add to cart
+    # Esperar a que el primer botón tenga el texto Add to cart 
+    # hacer click en el botón del primer prducto, para agregarlo al carrito 
     WebDriverWait(driver, 10).until(
         expected_conditions.text_to_be_present_in_element(
             (By.XPATH, "//div[@class='inventory_item'][1]//button"),
             "Add to cart"
         )
     )
-    # hacer click en el botón del primer prducto, para agregarlo al carrito 
     productos[0].find_element(By.TAG_NAME, "button").click()
 
     # sacar captura del carrito con el primer producto agregado
