@@ -92,6 +92,9 @@ def test_carrito(driver):
     )
     productos[0].find_element(By.TAG_NAME, "button").click()
 
+    # sacar captura del carrito con el primer producto agregado
+    driver.save_screenshot("reports/numero_carrito.png")
+
     # hacer click en el carrito para ir a la página del carrito
     carrito = WebDriverWait(driver, 10).until(
         expected_conditions.element_to_be_clickable((By.CLASS_NAME, "shopping_cart_link"))
@@ -108,9 +111,6 @@ def test_carrito(driver):
         expected_conditions.visibility_of_element_located((By.CLASS_NAME, "title"))
     )
     assert titulo_your_cart.text == "Your Cart"
-
-    # sacar captura del carrito con el primer producto agregado
-    driver.save_screenshot("reports/numero_carrito.png")
 
     # verificar que haya un producto dentro del carrito 
     WebDriverWait(driver, 15).until(
